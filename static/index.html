@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GitHub Events</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>GitHub Events</h1>
+    <table>
+        <tr>
+            <th>Event</th>
+            <th>Author</th>
+            <th>Branch</th>
+            <th>Timestamp</th>
+        </tr>
+        <tbody id="events"></tbody>
+    </table>
+    <script>
+        function fetchEvents() {
+            fetch('/events')
+                .then(response => response.json())
+                .then(data => {
+                    const eventsTable = document.getElementById('events');
+                    eventsTable.innerHTML = '';
+                    data.events.forEach(event => {
+                        const row = document.createElement('tr');
+                        const branch = event.event === 'push' ? event.to_branch : `${event.from_branch} to ${event.to_branch}`;
+                        row.innerHTML = `<td>${event.event}</td><td>${event.author}</td><td>${branch}</td><td>${new Date(event.timestamp).toLocaleString()}</td>`;
+                        eventsTable.appendChild(row);
+                    });
+                });
+        }
+
+        setInterval(fetchEvents, 15000);
+        window.onload = fetchEvents;
+    </script>
+</body>
+</html>
